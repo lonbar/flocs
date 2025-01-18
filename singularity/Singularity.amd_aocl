@@ -47,6 +47,7 @@ From: fedora:40
     export OMP_NUM_THREADS=1
     export OMP_MAX_THREADS=1
     export OPENBLAS_NUM_THREADS=1
+    export BLIS_NUM_THREADS=$OPENBLAS_NUM_THREADS
     export NUM_THREADS=128
     export OPENBLAS_TARGET={{ OPENBLASTARGET }}
 
@@ -745,6 +746,7 @@ From: fedora:40
     echo export OPENBLAS_MAX_THREADS=\$NCPU >> $INSTALLDIR/init.sh
     echo export OMP_NUM_THREADS=\$NCPU >> $INSTALLDIR/init.sh
     echo export OMP_MAX_THREADS=\$NCPU >> $INSTALLDIR/init.sh
+    echo export BLIS_NUM_THREADS=\$OPENBLAS_NUM_THREADS >> $INSTALLDIR/init.sh
     echo export HAS_CUDA=$HAS_CUDA >> $INSTALLDIR/init.sh
     if [ $HAS_CUDA = true ]; then
         echo export CUDA_HOME=/usr/local/cuda >> $INSTALLDIR/init.sh
