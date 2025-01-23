@@ -93,10 +93,6 @@ From: fedora:40
     export cmake=`which cmake`
     export CC=`which gcc`
     export CXX=`which g++`
-
-    mkdir -p $INSTALLDIR/patches
-    cd $INSTALLDIR && git clone --single-branch -b fedora-py3 https://github.com/tikk3r/flocs.git
-    mv $INSTALLDIR/flocs/patches/* $INSTALLDIR/patches/
     
     # Install OpenBLAS
     mkdir -p /opt/OpenBLAS
@@ -521,11 +517,6 @@ EOF
     ls ${INSTALLDIR}
     
     # Setup DDF
-    export PATCH_KILLMS_MAKEFILE_PREDICT=$INSTALLDIR/patches/killms_predict.patch
-    export PATCH_KILLMS_MAKEFILE_ARRAY=$INSTALLDIR/patches/killms_array.patch
-    export PATCH_KILLMS_MAKEFILE_GRIDDER=$INSTALLDIR/patches/killms_gridder.patch
-    export PATCH_DDFACET_CPUS=$INSTALLDIR/patches/DDFacet_cpus.patch
-
     pip --no-cache-dir install meqtrees-cattery --no-deps
     pip --no-cache-dir install owlcat --no-deps
 
@@ -660,6 +651,7 @@ EOF
     #
     # Install custom runners
     #
+    cd $INSTALLDIR && git clone --single-branch -b fedora-py3 https://github.com/tikk3r/flocs.git
     mkdir -p /opt/lofar/runners
     cd /opt/lofar/
     cp flocs/runners/run* ./runners/
