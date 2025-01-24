@@ -37,7 +37,6 @@ git+https://github.com/rvweeren/lofar_facet_selfcal.git
 git+https://github.com/jurjen93/lofar_helpers.git
 git+https://github.com/jurjen93/lofar_helpers@inference_script#subdirectory=neural_networks
 git+https://github.com/ratt-ru/kittens.git
-git+https://github.com/ratt-ru/shadeMS.git
 git+https://github.com/tikk3r/EveryStamp.git
 google-api-python-client
 google-auth
