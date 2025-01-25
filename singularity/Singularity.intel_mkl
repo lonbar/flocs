@@ -323,6 +323,7 @@ EOF
     mkdir -p $INSTALLDIR/dysco/build
     cd $INSTALLDIR/dysco && git clone https://github.com/aroffringa/dysco.git src
     cd src && git checkout $DYSCO_VERSION && echo export DYSCO_VERSION=$(git rev-parse --short HEAD) >> $INSTALLDIR/init.sh
+    sed -i "19s/11/${CPPSTD}/" CMakeLists.txt
     if [ $MARCH = 'x86-64' ] && [ $MTUNE = 'generic' ]; then
         cd $INSTALLDIR/dysco/build && cmake $CMAKE_ADD_OPTION -DCMAKE_INSTALL_PREFIX=$INSTALLDIR/dysco -DCASACORE_ROOT_DIR=$INSTALLDIR/casacore -DPORTABLE=True ../src && make -s -j $J && make install
     else
