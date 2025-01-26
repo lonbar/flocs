@@ -23,7 +23,7 @@ From: fedora:40
     export AOFLAGGER_VERSION=bdf03b28
     export CASACORE_VERSION=v3.6.1
     export DDFPIPELINE_VERSION=df58808
-    export DP3_VERSION=48e75b34
+    export DP3_VERSION=9b237dc0
     export DYSCO_VERSION=c682fe5
     export EVERYBEAM_VERSION=65685cba
     export HDF5_VERSION=1.14.5
