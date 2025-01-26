@@ -25,7 +25,6 @@ From: fedora:40
     export CASACORE_VERSION=b027afe
     export DDFPIPELINE_VERSION=df58808
     export DP3_VERSION=9b237dc0
-    export DYSCO_VERSION=c682fe5
     export EVERYBEAM_VERSION=59c755a6
     export HDF5_VERSION=1.14.5
     export IDG_VERSION=2af6f285
@@ -67,8 +66,8 @@ From: fedora:40
     else
         export CMAKE_ADD_OPTION="-Wno-dev"
     fi
-    export CPLUS_INCLUDE_PATH="/opt/hdf5/include:/opt/OpenBLAS/include:/usr/include/openmpi-x86_64:/usr/include/c++/14:/usr/include/python${PYTHON_VERSION}:$INSTALLDIR/casacore/include:/usr/include/boost:/usr/include/cfitsio:$INSTALLDIR/idg/include:$INSTALLDIR/EveryBeam/include:/usr/include/wcslib:/usr/include/freetype2/freetype:/usr/include/freetype2/freetype/config"
-    export CPATH="/usr/include/python${PYTHON_VERSION}:/opt/hdf5/include:/opt/OpenBLAS/include:/usr/include/openmpi-x86_64/:/usr/local/cuda/include:${INSTALLDIR}/casacore/include:$INSTALLDIR/idg/include:$INSTALLDIR/aoflagger/include:$INSTALLDIR/EveryBeam/include:/usr/include/wcslib:/usr/include/freetype2/freetype/config"
+    export CPLUS_INCLUDE_PATH="/opt/intel/oneapi/mkl/latest/include/fftw/:/opt/hdf5/include:/opt/OpenBLAS/include:/usr/include/openmpi-x86_64:/usr/include/c++/14:/usr/include/python${PYTHON_VERSION}:$INSTALLDIR/casacore/include:/usr/include/boost:/usr/include/cfitsio:$INSTALLDIR/idg/include:$INSTALLDIR/EveryBeam/include:/usr/include/wcslib:/usr/include/freetype2/freetype:/usr/include/freetype2/freetype/config"
+    export CPATH="/opt/intel/oneapi/mkl/latest/include/fftw/:/usr/include/python${PYTHON_VERSION}:/opt/hdf5/include:/opt/OpenBLAS/include:/usr/include/openmpi-x86_64/:/usr/local/cuda/include:${INSTALLDIR}/casacore/include:$INSTALLDIR/idg/include:$INSTALLDIR/aoflagger/include:$INSTALLDIR/EveryBeam/include:/usr/include/wcslib:/usr/include/freetype2/freetype/config"
     export CMAKE_PREFIX_PATH="/opt/hdf5:/opt/OpenBLAS:$INSTALLDIR/aoflagger:$INSTALLDIR/casacore:$INSTALLDIR/lofar:$INSTALLDIR/idg:/usr/lib64/openmpi:$INSTALLDIR/EveryBeam"
     export LD_LIBRARY_PATH="/opt/hdf5/lib:$INSTALLDIR/lofarstman/lib64:/opt/OpenBLAS/lib64:$INSTALLDIR/aoflagger/lib:$INSTALLDIR/casacore/lib:$INSTALLDIR/idg/lib:/usr/lib64/openmpi/lib/:$INSTALLDIR/EveryBeam/lib:$INSTALLDIR/sagecal/lib:$LD_LIBRARY_PATH"
     export PATH="/opt/hdf5/bin:/usr/lib64/openmpi/bin:$PATH"
@@ -289,7 +288,7 @@ EOF
             -DUSE_OPENMP=True \
             -DUSE_HDF5=True \
             -DBUILD_PYTHON3=True \
-            -DBUILD_DYSCO=OFF \
+            -DBUILD_DYSCO=ON \
             -DBLA_VENDOR=Intel10_64lp \
             ../src
     else
@@ -300,7 +299,7 @@ EOF
             -DUSE_OPENMP=True \
             -DUSE_HDF5=True \
             -DBUILD_PYTHON3=True \
-            -DBUILD_DYSCO=OFF \
+            -DBUILD_DYSCO=ON \
             -DBLAS_LIBRARIES=/opt/OpenBLAS/lib64/libopenblas.so \
             ../src
     fi
@@ -317,22 +316,6 @@ EOF
     pip uninstall -y python-casacore
     pip install --no-deps --no-binary python-casacore "python-casacore==${PYTHON_CASACORE_VERSION}"
     
-    #
-    # Install Dysco
-    #
-    mkdir -p $INSTALLDIR/dysco/build
-    cd $INSTALLDIR/dysco && git clone https://github.com/aroffringa/dysco.git src
-    cd src && git checkout $DYSCO_VERSION && echo export DYSCO_VERSION=$(git rev-parse --short HEAD) >> $INSTALLDIR/init.sh
-    sed -i "19s/11/${CPPSTD:3}/" CMakeLists.txt
-    if [ $MARCH = 'x86-64' ] && [ $MTUNE = 'generic' ]; then
-        cd $INSTALLDIR/dysco/build && cmake $CMAKE_ADD_OPTION -DCMAKE_INSTALL_PREFIX=$INSTALLDIR/dysco -DCASACORE_ROOT_DIR=$INSTALLDIR/casacore -DPORTABLE=True ../src && make -s -j $J && make install
-    else
-        cd $INSTALLDIR/dysco/build && cmake $CMAKE_ADD_OPTION -DCMAKE_INSTALL_PREFIX=$INSTALLDIR/dysco -DCASACORE_ROOT_DIR=$INSTALLDIR/casacore -DTARGET_CPU=$MARCH -DPORTABLE=False ../src && make -s -j $J && make install
-    fi
-    cd $INSTALLDIR
-    rm -rf $INSTALLDIR/dysco/build
-    rm -rf $INSTALLDIR/dysco/src
-
     #
     # Install SAGECal
     #
@@ -697,7 +680,6 @@ EOF
     echo export PATH=\$INSTALLDIR/ds9/bin:\$PATH >> $INSTALLDIR/init.sh
     echo export PATH=\$INSTALLDIR/DP3/bin:\$PATH  >> $INSTALLDIR/init.sh
     echo export PATH=\$INSTALLDIR/difmap/uvf_difmap:\$PATH >> $INSTALLDIR/init.sh
-    echo export PATH=\$INSTALLDIR/dysco/bin:\$PATH  >> $INSTALLDIR/init.sh
     echo export PATH=/opt/hdf5/bin:\$PATH  >> $INSTALLDIR/init.sh
     echo export PATH=\$INSTALLDIR/sagecal/bin:\$PATH  >> $INSTALLDIR/init.sh
     echo export PATH=\$INSTALLDIR/wsclean/bin:\$PATH  >> $INSTALLDIR/init.sh
@@ -707,7 +689,7 @@ EOF
     echo export PATH=\$INSTALLDIR/MultiNest/bin:\$PATH >> $INSTALLDIR/init.sh
     echo export PATH=/usr/lib64/openmpi/bin:\$PATH >> $INSTALLDIR/init.sh
     echo export PATH=\$INSTALLDIR/VLBI-cwl/scripts:\$PATH >> $INSTALLDIR/init.sh
-    echo export LD_LIBRARY_PATH=\$INSTALLDIR/aoflagger/lib:\$INSTALLDIR/casacore/lib:\$INSTALLDIR/DP3/lib:\$INSTALLDIR/dysco/lib:\$INSTALLDIR/EveryBeam/lib:/opt/hdf5/lib:\$INSTALLDIR/idg/lib:\$INSTALLDIR/lofar/lib:\$INSTALLDIR/lofar/lib64:\$LD_LIBRARY_PATH  >> $INSTALLDIR/init.sh
+    echo export LD_LIBRARY_PATH=\$INSTALLDIR/aoflagger/lib:\$INSTALLDIR/casacore/lib:\$INSTALLDIR/DP3/lib:\$INSTALLDIR/EveryBeam/lib:/opt/hdf5/lib:\$INSTALLDIR/idg/lib:\$INSTALLDIR/lofar/lib:\$INSTALLDIR/lofar/lib64:\$LD_LIBRARY_PATH  >> $INSTALLDIR/init.sh
     echo export LD_LIBRARY_PATH=/opt/OpenBLAS/lib64:\$LD_LIBRARY_PATH >> $INSTALLDIR/init.sh
     echo export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib/:\$LD_LIBRARY_PATH >> $INSTALLDIR/init.sh
     echo export LD_LIBRARY_PATH=\$INSTALLDIR/sagecal/lib:\$LD_LIBRARY_PATH >> $INSTALLDIR/init.sh
@@ -767,7 +749,6 @@ EOF
     * Difmap: $INSTALLDIR/difmap
     * DP3: $INSTALLDIR/DP3
     * DS9: $INSTALLDIR/ds9
-    * Dysco: $INSTALLDIR/dysco
     * EveryBeam: $INSTALLDIR/EveryBeam
     * IDG: $INSTALLDIR/idg
     * WSClean: $INSTALLDIR/wsclean

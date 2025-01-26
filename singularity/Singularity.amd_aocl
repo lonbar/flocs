@@ -24,7 +24,6 @@ From: fedora:40
     export CASACORE_VERSION=b027afe
     export DDFPIPELINE_VERSION=df58808
     export DP3_VERSION=9b237dc0
-    export DYSCO_VERSION=c682fe5
     export EVERYBEAM_VERSION=59c755a6
     export HDF5_VERSION=1.14.5
     export IDG_VERSION=2af6f285
@@ -315,7 +314,7 @@ From: fedora:40
         -DUSE_OPENMP=True \
         -DUSE_HDF5=True \
         -DBUILD_PYTHON3=True \
-        -DBUILD_DYSCO=OFF \
+        -DBUILD_DYSCO=ON \
         -DFFTW3_LIBRARY="${AOCL_ROOT}/lib/libfftw3.so" \
         -DFFTW3_THREADS_LIBRARY="${AOCL_ROOT}/lib/libfftw3_threads.so" \
         -DFFTW3F_LIBRARY="${AOCL_ROOT}/lib/libfftw3f.so" \
@@ -338,22 +337,6 @@ From: fedora:40
     pip uninstall -y python-casacore
     pip install --no-deps --no-binary python-casacore "python-casacore==${PYTHON_CASACORE_VERSION}"
     
-    #
-    # Install Dysco
-    #
-    mkdir -p $INSTALLDIR/dysco/build
-    cd $INSTALLDIR/dysco && git clone https://github.com/aroffringa/dysco.git src
-    cd src && git checkout $DYSCO_VERSION && echo export DYSCO_VERSION=$(git rev-parse --short HEAD) >> $INSTALLDIR/init.sh
-    sed -i "19s/11/${CPPSTD:3}/" CMakeLists.txt
-    if [ $MARCH = 'x86-64' ] && [ $MTUNE = 'generic' ]; then
-        cd $INSTALLDIR/dysco/build && cmake $CMAKE_ADD_OPTION -DCMAKE_INSTALL_PREFIX=$INSTALLDIR/dysco -DCASACORE_ROOT_DIR=$INSTALLDIR/casacore -DPORTABLE=True ../src && make -s -j $J && make install
-    else
-        cd $INSTALLDIR/dysco/build && cmake $CMAKE_ADD_OPTION -DCMAKE_INSTALL_PREFIX=$INSTALLDIR/dysco -DCASACORE_ROOT_DIR=$INSTALLDIR/casacore -DTARGET_CPU=$MARCH -DPORTABLE=False ../src && make -s -j $J && make install
-    fi
-    cd $INSTALLDIR
-    rm -rf $INSTALLDIR/dysco/build
-    rm -rf $INSTALLDIR/dysco/src
-
     #
     # Install SAGECal
     #
@@ -713,7 +696,6 @@ From: fedora:40
     echo export PATH=\$INSTALLDIR/ds9/bin:\$PATH >> $INSTALLDIR/init.sh
     echo export PATH=\$INSTALLDIR/DP3/bin:\$PATH  >> $INSTALLDIR/init.sh
     echo export PATH=\$INSTALLDIR/difmap/uvf_difmap:\$PATH >> $INSTALLDIR/init.sh
-    echo export PATH=\$INSTALLDIR/dysco/bin:\$PATH  >> $INSTALLDIR/init.sh
     echo export PATH=/opt/hdf5/bin:\$PATH  >> $INSTALLDIR/init.sh
     echo export PATH=\$INSTALLDIR/sagecal/bin:\$PATH  >> $INSTALLDIR/init.sh
     echo export PATH=\$INSTALLDIR/wsclean/bin:\$PATH  >> $INSTALLDIR/init.sh
@@ -724,7 +706,7 @@ From: fedora:40
     echo export PATH=\$INSTALLDIR/MultiNest/bin:\$PATH >> $INSTALLDIR/init.sh
     echo export PATH=/opt/flang/bin:\$PATH >> $INSTALLDIR/init.sh
     echo export PATH=/usr/lib64/openmpi/bin:\$PATH >> $INSTALLDIR/init.sh
-    echo export LD_LIBRARY_PATH=\$INSTALLDIR/aoflagger/lib:\$INSTALLDIR/casacore/lib:\$INSTALLDIR/DP3/lib:\$INSTALLDIR/dysco/lib:\$INSTALLDIR/EveryBeam/lib:/opt/hdf5/lib:\$INSTALLDIR/idg/lib:\$INSTALLDIR/lofar/lib:\$INSTALLDIR/lofar/lib64:\$LD_LIBRARY_PATH  >> $INSTALLDIR/init.sh
+    echo export LD_LIBRARY_PATH=\$INSTALLDIR/aoflagger/lib:\$INSTALLDIR/casacore/lib:\$INSTALLDIR/DP3/lib:\$INSTALLDIR/EveryBeam/lib:/opt/hdf5/lib:\$INSTALLDIR/idg/lib:\$INSTALLDIR/lofar/lib:\$INSTALLDIR/lofar/lib64:\$LD_LIBRARY_PATH  >> $INSTALLDIR/init.sh
     echo export LD_LIBRARY_PATH=/opt/OpenBLAS/lib64:\$LD_LIBRARY_PATH >> $INSTALLDIR/init.sh
     echo export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib/:\$LD_LIBRARY_PATH >> $INSTALLDIR/init.sh
     echo export LD_LIBRARY_PATH=\$INSTALLDIR/sagecal/lib:\$LD_LIBRARY_PATH >> $INSTALLDIR/init.sh
@@ -775,7 +757,6 @@ From: fedora:40
     * Difmap: $INSTALLDIR/difmap
     * DP3: $INSTALLDIR/DP3
     * DS9: $INSTALLDIR/ds9
-    * Dysco: $INSTALLDIR/dysco
     * EveryBeam: $INSTALLDIR/EveryBeam
     * IDG: $INSTALLDIR/idg
     * WSClean: $INSTALLDIR/wsclean
